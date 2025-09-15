@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container p-3">
+  <h2 class="text-center">{{ template_data.title }}</h2>
+  <hr />
+
+  <ul class="list-group">
+    {% for review in template_data.reviews %}
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+      <div class="ms-2 me-auto">
+        <div class="fw-bold">
+          Movie: <a href="{% url 'movies.show' id=review.movie.id %}">{{ review.movie.name }}</a>
+        </div>
+        <p>"{{ review.comment }}"</p>
+        <small class="text-muted">By: {{ review.user.username }} on {{ review.date|date:"F j, Y" }}</small>
+      </div>
+      <span class="badge bg-primary rounded-pill">{{ review.like_count }} Likes</span>
+    </li>
+    {% empty %}
+    <li class="list-group-item">No reviews have been liked yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% endblock content %}

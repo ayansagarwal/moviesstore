@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Movie, Review
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 
 def index(request):
     search_term = request.GET.get('search')
@@ -61,3 +62,24 @@ def delete_review(request, id, review_id):
         user=request.user)
     review.delete()
     return redirect('movies.show', id=id)
+
+@login_required
+def like_review(request, review_id):
+    review = get_object_or_404(Review, id=review_id)
+    # Check if the user has already liked this review
+    if review.likes.filter(id=request.user.id).exists():
+        # User has liked, so unlike it
+        review.likes.remove(request.user)
+    else:
+        # User has not liked, so like it
+        review.likes.add(request.user)
+    return redirect('movies.show', id=review.movie.id)
+
+def top_reviews(request):
+    # Annotate reviews with the count of likes and order by it
+    top_reviews_list = Review.objects.annotate(like_count=Count('likes')).order_by('-like_count')
+
+    template_data = {}
+    template_data['title'] = 'Top Reviews'
+    template_data['reviews'] = top_reviews_list
+    return render(request, 'movies/top_reviews.html', {'template_data': template_data})

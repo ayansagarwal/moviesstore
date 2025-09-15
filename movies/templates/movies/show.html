@@ -31,25 +31,43 @@
         <ul class="list-group">
           {% for review in template_data.reviews %}
           <li class="list-group-item pb-3 pt-3">
-            <h5 class="card-title">
-              Review by {{ review.user.username }}
-            </h5>
-            <h6 class="card-subtitle mb-2 text-muted">
-              {{ review.date }}
-            </h6>
-            <p class="card-text">{{ review.comment }}</p>
-            {% if user.is_authenticated and user == review.user %}
-            <a class="btn btn-primary"
-              href="{% url 'movies.edit_review' id=template_data.movie.id review_id=review.id %}">
-              Edit
-            </a>
-            <a class="btn btn-danger"
-              href="{% url 'movies.delete_review' id=template_data.movie.id review_id=review.id %}">
-              Delete
-            </a>
-            {% endif %}
-          </li>
-          {% endfor %}
+    <h5 class="card-title">
+      Review by {{ review.user.username }}
+    </h5>
+    <h6 class="card-subtitle mb-2 text-muted">
+      {{ review.date }}
+    </h6>
+    <p class="card-text">{{ review.comment }}</p>
+
+    <div class="d-flex align-items-center">
+      {% if user.is_authenticated %}
+          <form action="{% url 'movies.like_review' review_id=review.id %}" method="POST" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm 
+              {% if user in review.likes.all %}btn-danger{% else %}btn-primary{% endif %}">
+              {% if user in review.likes.all %}
+                Unlike
+              {% else %}
+                Like
+              {% endif %}
+            </button>
+          </form>
+          {% endif %}
+          <span class="ms-2">{{ review.likes.count }} Likes</span>
+        </div>
+
+        {% if user.is_authenticated and user == review.user %}
+        <div class="mt-2">
+          <a class="btn btn-primary" href="{% url 'movies.edit_review' id=template_data.movie.id review_id=review.id %}">
+            Edit
+          </a>
+          <a class="btn btn-danger" href="{% url 'movies.delete_review' id=template_data.movie.id review_id=review.id %}">
+            Delete
+          </a>
+        </div>
+        {% endif %}
+        </li>
+      {% endfor %}
         </ul>
 
         {% if user.is_authenticated %}
