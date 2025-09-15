@@ -8,6 +8,7 @@ class Movie(models.Model):
     price = models.IntegerField()
     description = models.TextField()
     image = models.ImageField(upload_to='movie_images/')
+    hearts = models.ManyToManyField(User, related_name='hearted_movies', blank=True)
     def __str__(self):
         return str(self.id) + ' - ' + self.name
     

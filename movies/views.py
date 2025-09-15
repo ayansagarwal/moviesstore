@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Movie, Review
 from django.contrib.auth.decorators import login_required
@@ -83,3 +84,39 @@ def top_reviews(request):
     template_data['title'] = 'Top Reviews'
     template_data['reviews'] = top_reviews_list
     return render(request, 'movies/top_reviews.html', {'template_data': template_data})
+
+
+@login_required
+def heart_movie(request, movie_id):
+    movie = get_object_or_404(Movie, id=movie_id)
+    
+    is_hearted = False
+    if movie.hearts.filter(id=request.user.id).exists():
+        # If it exists, remove it
+        movie.hearts.remove(request.user)
+        is_hearted = False
+    else:
+        # If it doesn't exist, add it
+        movie.hearts.add(request.user)
+        is_hearted = True
+
+    # This is the key part: check for a header sent by JavaScript
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'status': 'ok', 'hearted': is_hearted})
+
+    # Fallback for non-JavaScript requests
+    return redirect(request.META.get('HTTP_REFERER', 'movies.index'))
+
+
+@login_required
+def hearted_movies_list(request):
+    """
+    Displays a list of all movies the current user has hearted.
+    """
+    # Get all movies hearted by the current user
+    hearted_movies = request.user.hearted_movies.all()
+    
+    template_data = {}
+    template_data['title'] = 'My Hearted Movies'
+    template_data['movies'] = hearted_movies
+    return render(request, 'movies/hearted_movies.html', {'template_data': template_data})

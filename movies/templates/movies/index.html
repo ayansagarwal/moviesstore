@@ -7,6 +7,16 @@
       <div class="col mx-auto mb-3">
         <h2>List of Movies</h2>
         <hr />
+        <ul class="nav nav-pills mb-3">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'movies.index' %}">All Movies</a>
+          </li>
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'movies.hearted_list' %}">My Hearted Movies ❤️</a>
+          </li>
+          {% endif %}
+        </ul>
         <p class="card-text">
           <form method="GET">
             <div class="row">
@@ -30,12 +40,23 @@
     <div class="row">
       {% for movie in template_data.movies %}
       <div class="col-md-4 col-lg-3 mb-2">
-        <div class="p-2 card align-items-center pt-4">
-          <img src="{{ movie.image.url }}"
-            class="card-img-top rounded img-card-200">
+        <div class="p-2 card align-items-center pt-4" style="position: relative;">
+          
+          {% if user.is_authenticated %}
+            <button class="heart-btn" 
+                    data-movie-id="{{ movie.id }}" 
+                    style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.5rem; cursor: pointer;">
+              {% if movie.id in template_data.hearted_movie_ids %}
+                ❤️
+              {% else %}
+                🤍
+              {% endif %}
+            </button>
+          {% endif %}
+          
+          <img src="{{ movie.image.url }}" class="card-img-top rounded img-card-200">
           <div class="card-body text-center">
-            <a href="{% url 'movies.show' id=movie.id %}"
-              class="btn bg-dark text-white">
+            <a href="{% url 'movies.show' id=movie.id %}" class="btn bg-dark text-white">
               {{ movie.name }}
             </a>
           </div>
@@ -45,4 +66,38 @@
     </div>
   </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const heartButtons = document.querySelectorAll('.heart-btn');
+
+  heartButtons.forEach(button => {
+    button.addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent any default button action
+      
+      const movieId = this.dataset.movieId;
+      const url = `/movies/${movieId}/heart/`;
+
+      // Use the browser's built-in fetch API
+      fetch(url, {
+        method: 'GET', // Using GET as the URL implies the action
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest', // Identifies the request as AJAX
+        },
+      })
+      .then(response => response.json()) // Parse the JSON from the view
+      .then(data => {
+        // If the server confirms success, update the button's icon
+        if (data.status === 'ok') {
+          if (data.hearted) {
+            this.innerHTML = '❤️'; // Change to filled heart
+          } else {
+            this.innerHTML = '🤍'; // Change to empty heart
+          }
+        }
+      })
+      .catch(error => console.error('Error:', error));
+    });
+  });
+});
+</script>
 {% endblock content %}

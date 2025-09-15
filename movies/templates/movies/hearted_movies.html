@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<div class="p-3">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col mx-auto mb-3">
+        <h2>{{ template_data.title }}</h2>
+        <hr />
+        <ul class="nav nav-pills mb-3">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'movies.index' %}">All Movies</a>
+          </li>
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'movies.hearted_list' %}">My Hearted Movies ❤️</a>
+          </li>
+          {% endif %}
+        {% if not template_data.movies %}
+          <p>You haven't hearted any movies yet!</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="row">
+      {% for movie in template_data.movies %}
+      <div class="col-md-4 col-lg-3 mb-2">
+        <div class="p-2 card align-items-center pt-4">
+          <img src="{{ movie.image.url }}"
+               class="card-img-top rounded img-card-200">
+          <div class="card-body text-center">
+            <a href="{% url 'movies.show' id=movie.id %}"
+               class="btn bg-dark text-white">
+              {{ movie.name }}
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock content %}
