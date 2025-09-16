@@ -13,4 +13,5 @@ urlpatterns = [
     path('top-reviews/', views.top_reviews, name='movies.top_reviews'),
     path('<int:movie_id>/heart/', views.heart_movie, name='movies.heart'),
     path('hearted/', views.hearted_movies_list, name='movies.hearted_list'),
+    path('movies/<int:id>/rate/', views.add_rating, name='movies.add_rating'),
 ]

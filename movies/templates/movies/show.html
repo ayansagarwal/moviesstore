@@ -25,7 +25,32 @@
             </div>
           </form>
         </p>
-
+        {% if user.is_authenticated %}
+        <div class="card my-4">
+          
+          <div class="card-header">
+            <h5>⭐ Rate This Movie</h5>
+          </div>
+          <div class="card-body">
+            
+              {% if template_data.current_user_rating %}
+                <p>You rated this movie: <strong>{{ template_data.current_user_rating.stars }} out of 5 stars</strong>. You can change your rating below.</p>
+              {% else %}
+                <p>You have not rated this movie yet.</p>
+              {% endif %}
+              
+              <form action="{% url 'movies.add_rating' id=template_data.movie.id %}" method="POST">
+                {% csrf_token %}
+                <div class="input-group">
+                  {{ template_data.rating_form.stars }}
+                  <button type="submit" class="btn btn-primary ms-2">Submit Rating</button>
+                </div>
+              </form>
+            
+          </div>
+          
+        </div>
+        {% endif %}
         <h2>Reviews</h2>
         <hr />
         <ul class="list-group">
