@@ -1,0 +1,32 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container" style="padding-top: 2rem;">
+    <h1>My Subscription Status</h1>
+    <hr>
+
+    <div class="card text-center" style="max-width: 35rem; margin: auto; border: 1px solid #ddd;">
+        <div class="card-header bg-light">
+            <h2>Your Current Level: {{ subscription_level }} {{ emoji }}</h2>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">You've spent a total of: <strong>${{ total_spent|floatformat:2 }}</strong></h5>
+            <p class="card-text mt-3">
+                Subscription tiers are based on your total purchase history.
+            </p>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item {% if subscription_level == 'Basic' %}active text-white{% endif %}">
+                    <strong>Basic:</strong> Spent less than $15.00
+                </li>
+                <li class="list-group-item {% if subscription_level == 'Medium' %}active text-white{% endif %}">
+                    <strong>Medium:</strong> Spent between $15.00 and $30.00
+                </li>
+                <li class="list-group-item {% if subscription_level == 'Premium' %}active text-white{% endif %}">
+                    <strong>Premium:</strong> Spent more than $30.00
+                </li>
+            </ul>
+        </div>
+        <div class="card-footer text-muted">
+            Thank you for your loyalty!
+        </div>
+    </div>
+</div>
+{% endblock %}
